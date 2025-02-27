@@ -1,12 +1,20 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class MouseController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public float speed;
+
+    public GameObject characterPrefab;
+    private CharacterInfo character;
+    private PathFinder pathFinder;
+    private List<OverlayTile> path = new List<OverlayTile>();
+
+
+    private void Start()
     {
-        
+        pathFinder = new PathFinder();
     }
 
     // Update is called once per frame
@@ -16,14 +24,45 @@ public class MouseController : MonoBehaviour
 
         if (focusedTileHit.HasValue)
         {
-            GameObject overlayTile = focusedTileHit.Value.collider.gameObject;
-            this.transform.position = overlayTile.transform.position;
+            OverlayTile overlayTile = focusedTileHit.Value.collider.gameObject.GetComponent<OverlayTile>();
+            transform.position = overlayTile.transform.position;
             gameObject.GetComponent<SpriteRenderer>().sortingOrder = overlayTile.GetComponent<SpriteRenderer>().sortingOrder;
 
             if (Input.GetMouseButtonDown(0))
             {
-                overlayTile.GetComponent<OverlayTile>().ShowTile();
+                overlayTile.ShowTile();
+                
+                if(character == null)
+                {
+                    character = Instantiate(characterPrefab).GetComponent<CharacterInfo>();
+                    PositionCharacterOnTile(overlayTile);
+                }
+                else
+                {
+                    path = pathFinder.FindPath(character.activeTile, overlayTile);
+
+
+                    Debug.Log(path.Count);
+                }
             }
+        }
+
+        if(path.Count > 0)
+        {
+            MoveAlongPath();
+        }
+    }
+
+    private void MoveAlongPath()
+    {
+        var step = speed * Time.deltaTime;
+        
+        character.transform.position = Vector2.MoveTowards(character.transform.position, path[0].transform.position,step);
+
+        if(Vector2.Distance(character.transform.position, path[0].transform.position) < 0.0001f)
+        {
+            PositionCharacterOnTile(path[0]);
+            path.RemoveAt(0);
         }
     }
 
@@ -41,5 +80,12 @@ public class MouseController : MonoBehaviour
 
         return null;
 
+    }
+
+    private void PositionCharacterOnTile(OverlayTile tile)
+    {
+       character.transform.position = new Vector3(tile.transform.position.x, tile.transform.position.y, tile.transform.position.z);
+       character.GetComponent<SpriteRenderer>().sortingOrder = tile.GetComponent<SpriteRenderer>().sortingOrder +1;
+       character.activeTile = tile;
     }
 }
