@@ -6,7 +6,7 @@ using System;
 
 public class PathFinder 
 {
-    public List<OverlayTile> FindPath(OverlayTile start, OverlayTile end)
+    public List<OverlayTile> FindPath(OverlayTile start, OverlayTile end, List<OverlayTile> searchableTiles)
     {
         List<OverlayTile> openList = new List<OverlayTile>(); // List of Tiles to check
         List<OverlayTile> closedList = new List<OverlayTile>(); // List of checked Tiles
@@ -30,7 +30,8 @@ public class PathFinder
 
             }
 
-            var neighbourTiles = GetNeighbourTile(currentOverlayTile);
+            var neighbourTiles = MapManager.Instance.GetNeighbourTiles(currentOverlayTile, searchableTiles);
+
 
             foreach(var neighbour in neighbourTiles)
             {
@@ -77,60 +78,5 @@ public class PathFinder
         return Mathf.Abs(start.gridLocation.x - neighbour.gridLocation.x) + Mathf.Abs(start.gridLocation.y - neighbour.gridLocation.y);
     }
 
-    private List<OverlayTile> GetNeighbourTile(OverlayTile currentOverlayTile)
-    {
-        var map = MapManager.Instance.map;
-
-        List<OverlayTile> neighbours = new List<OverlayTile>();
-
-        // Check for neighbour tiles
-
-        // Top Neighbour
-        Vector2Int locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x,
-            currentOverlayTile.gridLocation.y + 1
-            );
-
-        if (map.ContainsKey(locationToCheck))
-        {
-            neighbours.Add(map[locationToCheck]); // If tile exists add to neighbour
-        }
-
-        // Bottom Neighbour
-            locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x,
-            currentOverlayTile.gridLocation.y - 1
-            );
-
-        if (map.ContainsKey(locationToCheck))
-        {
-            neighbours.Add(map[locationToCheck]); // If tile exists add to neighbour
-        }
-
-
-        // Right Neighbour
-            locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x + 1,
-            currentOverlayTile.gridLocation.y
-            );
-
-        if (map.ContainsKey(locationToCheck))
-        {
-            neighbours.Add(map[locationToCheck]); // If tile exists add to neighbour
-        }
-
-
-        // Left Neighbour
-            locationToCheck = new Vector2Int(
-            currentOverlayTile.gridLocation.x - 1,
-            currentOverlayTile.gridLocation.y 
-            );
-
-        if (map.ContainsKey(locationToCheck))
-        {
-            neighbours.Add(map[locationToCheck]); // If tile exists add to neighbour
-        }
-
-        return neighbours;
-    }
+    
 }
