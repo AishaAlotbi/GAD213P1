@@ -9,24 +9,29 @@ public class MouseController : MonoBehaviour
     public GameObject characterPrefab;
     private CharacterInfo character;
 
+    
     private PathFinder pathFinder;
     private RangeFinder rangeFinder;
     private ArrowTranslator arrowTranslator;
     private List<OverlayTile> path = new List<OverlayTile>();
     private List<OverlayTile> inRangeTiles = new List<OverlayTile>();
 
-
+    [System.Obsolete]
     private void Start()
     {
         pathFinder = new PathFinder();
         rangeFinder = new RangeFinder();
         arrowTranslator = new ArrowTranslator();
+
+
     }
 
     bool isMoving = false;
 
     void LateUpdate()
     {
+
+
         var focusedTileHit = GetFocusedOnTile();
 
         if (focusedTileHit.HasValue)
@@ -67,13 +72,18 @@ public class MouseController : MonoBehaviour
                 else
                 {
                     isMoving = true;
-                }
+                }  
+                                   
             }
+
+           
         }
 
         if(path.Count > 0 && isMoving)
-        {
-            MoveAlongPath();
+        { 
+            
+          MoveAlongPath();
+              
         }
     }
 
